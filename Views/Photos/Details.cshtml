@@ -1,0 +1,128 @@
+﻿@model PhotoAdventureWorks.ViewModels.PhotoDetailsViewModel
+
+@{
+    ViewData["Title"] = "Detalle de la Foto";
+    bool isOwner = User.Identity != null && User.Identity.IsAuthenticated && Model.Photo != null && Model.Photo.User != null && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == Model.Photo.User?.Id;
+    var uploadedDate = ViewBag.UploadedDate as DateTime?;
+}
+
+<div class="container bg-light p-sm-5" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <div class="row">
+        <div class="col-md-12" style="padding: 15px;">
+            <div class="row">
+                <div class="col-md-6 d-flex justify-content-center align-items-center" style="height: 400px;">
+                    @if (Model.Photo?.PhotoFile != null)
+                    {
+                        <img src="@Model.Photo.PhotoFile" alt="@Model.Photo.Title" class="img-fluid" style="max-height: 100%; max-width: 100%;" />
+                    }
+                </div>
+                <div class="col-md-6" style="background-color: aliceblue;">
+                    <div style="padding: 15px;">
+                        <h3>@Model.Photo?.Title</h3>
+                        <p><strong>Descripción:</strong> @Model.Photo?.Description</p>
+                        <p><strong>Subido por:</strong> @Model.Photo?.User?.UserName</p>
+                        <p><strong>Fecha de captura:</strong> @Model.Photo?.CreatedDate.ToShortDateString()</p>
+                        @if (uploadedDate.HasValue)
+                        {
+                            <p><strong>Fecha de publicación:</strong> @uploadedDate.Value.ToShortDateString()</p>
+                        }
+                    </div>
+                    @if (isOwner)
+                    {
+                        <div class="d-flex justify-content-lg-start">
+                            <a asp-action="Edit" asp-route-id="@Model.Photo?.PhotoID">Editar Foto</a>&nbsp; || &nbsp;
+                            <a asp-action="Delete" asp-route-id="@Model.Photo?.PhotoID">Borrar Foto</a>
+                        </div>
+                    }
+                    <br>
+                    <div class="d-flex justify-content-lg-start">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <a asp-action="UserGallery" class="btn btn-primary mr-2;"> Volver a la galeria</a>
+                            <p>&nbsp;</p>
+                            <a asp-action="Index" class="btn btn-success mr-2">Ver todas las fotos</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Index" class="btn btn-primary mr-2">Ver todas las fotos</a>
+                            <p>&nbsp;</p>
+                            <a asp-area="Identity" class="btn btn-success" asp-page="/Account/Register">Registrarse</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECCION PRINCIPAL -->
+<div class="container bg-light p-sm-5 mt-5" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <!-- ROW PRINCIPAL -->
+        <div class="row">
+            <!-- SECCION 1: Formulario de Comentarios -->
+            <div class="col-md-4">
+                <h4>Agregar comentario</h4>
+                <hr />
+                <form asp-controller="Comments" asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" name="PhotoID" value="@Model.Photo.PhotoID" />
+                    <input type="hidden" name="User" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" />
+                    <div class="form-group">
+                        <label for="Subject">Asunto</label>
+                        <input type="text" class="form-control" id="Subject" name="Subject" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="Body">Comentario</label>
+                        <textarea class="form-control" id="Body" name="Body" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Enviar comentario</button>
+                </form>
+            </div>
+
+            <!-- SECCION 2: Comentarios -->
+            <div class="col-md-8">
+                @if (Model.Comments?.Count > 0)
+                {
+                    <h4>Comentarios</h4>
+                    <ul class="list-group">
+                        @foreach (var comment in Model.Comments)
+                        {
+                            <li class="list-group-item mb-3" style="border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                <h6 class="mb-1"><strong>Asunto:</strong> @comment.Subject</h6>
+                                <p class="mb-1"><strong>Mensaje:</strong> @comment.Body</p>
+                                <small class="text-muted">Por: @comment.User?.UserName</small>
+                                @if (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == comment.User?.Id)
+                                {
+                                    <br />
+                                    <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@comment.CommentID" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Borrar comentario</button>
+                                    </form>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <h4>No hay comentarios</h4>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>
+            Debes ser usuario registrado para ver o hacer comentarios.
+            <a asp-area="Identity" asp-page="/Account/Login">Inicia sesión</a> o
+            <a asp-area="Identity" asp-page="/Account/Register">regístrate aquí</a> para comentar.
+        </p>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

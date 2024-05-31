@@ -1,0 +1,41 @@
+﻿@model IEnumerable<PhotoAdventureWorks.Models.Photo>
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Photo Adventure Works - @User.Identity?.Name Share your Photos with the world!</p>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <p>Comparte tus fotos con el mundo </p><a asp-action="Upload" asp-controller="Photos" class="btn btn-primary">Subir Photo</a>
+    }
+    else
+    {
+        <p>Unete <a asp-area="Identity" asp-page="/Account/Register">Aqui</a> para compartir tus fotos y comentar!</p>
+    }  
+</div>
+
+
+
+<h2 class="mt-5">Últimas Fotos Subidas Por Los Usuarios</h2>
+<div class="row bg-light p-4" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    @foreach (var photo in Model)
+    {
+        <div class="col-md-3 mt-3">
+            <div class="card h-100 shadow-sm">
+                <a asp-action="Details" asp-controller="Photos" asp-route-id="@photo.PhotoID">
+                    <img src="@photo.PhotoFile" class="card-img-top img-fluid" alt="@photo.Title" style="height: 300px; object-fit: cover;" />
+                </a>
+                <div class="card-body" style="background-color:#EEF7FF">
+                    <h5 class="card-title">@photo.Title</h5>
+
+                    <a asp-action="Details" asp-controller="Photos" asp-route-id="@photo.PhotoID">Detalles</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

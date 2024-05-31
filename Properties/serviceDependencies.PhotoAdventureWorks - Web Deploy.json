@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "serviceConnectorResourceId": "",
+      "secretStore": "AzureAppSettings",
+      "type": "mssql.onprem",
+      "connectionId": "ConnectionStrings:DefaultConnection"
+    },
+    "mssql2": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/PhotoAdventureWorks/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsProductionConnection_00AAA9BE2C",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/pawdb/databases/aspnet-PhotoAdventureWorks",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:ProductionConnection",
+      "dynamicId": null
+    }
+  }
+}
